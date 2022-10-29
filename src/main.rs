@@ -212,17 +212,17 @@ fn main() {
         match tile {
             Tile::Collapsed(_) => (),
             Tile::Uncollapsed(entropy) => {
-                'scan: for other in possible_tiles.iter() {
+                for other in possible_tiles.iter() {
                     match map[*other] {
                         Tile::Collapsed(_) => unreachable!("possible_tiles contains a collapsed tile"),
                         Tile::Uncollapsed(other_entropy) => {
                             if entropy < &other_entropy {
                                 possible_tiles.clear();
                                 possible_tiles.push(i);
-                                break 'scan;
+                                break;
                             } else if entropy == &other_entropy {
                                 possible_tiles.push(i);
-                                break 'scan;
+                                break;
                             }
                         },
                     }
