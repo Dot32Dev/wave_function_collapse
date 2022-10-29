@@ -3,20 +3,19 @@ use rand::Rng;
 const WIDTH: usize = 50;
 const HEIGHT: usize = 10;
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, Ord, PartialOrd, Eq, PartialEq)]
 enum Connection {
     Double,
-    Single,
     Empty,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Ord, PartialOrd, Eq, PartialEq)]
 struct Cell {
     character: char,
     connections: [Connection; 4],
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Ord, PartialOrd, Eq, PartialEq)]
 enum Tile {
     Collapsed(Cell),
     Uncollapsed(u8),
@@ -207,6 +206,37 @@ fn main() {
     }
 
     map[pos] = Tile::Collapsed(chosen_cell);
+
+    let mut possible_tiles = Vec::new();
+    for (i, tile) in map.iter().enumerate() {
+        match tile {
+            Tile::Collapsed(_) => (),
+            Tile::Uncollapsed(entropy) => {
+                'scan: for other in possible_tiles.iter() {
+                    match map[*other] {
+                        Tile::Collapsed(_) => unreachable!("possible_tiles contains a collapsed tile"),
+                        Tile::Uncollapsed(other_entropy) => {
+                            if entropy < &other_entropy {
+                                possible_tiles.clear();
+                                possible_tiles.push(i);
+                                break 'scan;
+                            } else if entropy == &other_entropy {
+                                possible_tiles.push(i);
+                                break 'scan;
+                            }
+                        },
+                    }
+                }
+                if possible_tiles.is_empty() {
+                    possible_tiles.push(i);
+                }
+            },
+        }
+    }
+
+    println!("possible_tiles: {:?}", possible_tiles);
+    let chosen_tile = possible_tiles[rand::thread_rng().gen_range(0..possible_tiles.len())];
+    println!("chosen_tile: {}", chosen_tile);
 
     draw_map(&map);
 }
