@@ -135,13 +135,15 @@ fn main() {
         },
     ];
 
-    let mut map = [[Tile::Uncollapsed(cells.len() as u8); WIDTH]; HEIGHT];
-    let pos = (rand::thread_rng().gen_range(0..HEIGHT), rand::thread_rng().gen_range(0..WIDTH));
+    //1 dimensional array for a 2 dimensional map
+    let mut map = [Tile::Uncollapsed(cells.len() as u8); WIDTH * HEIGHT];
+    let pos: usize = rand::thread_rng().gen_range(0..WIDTH * HEIGHT);
+    println!("pos: {}", pos);
     let chosen_cell = cells[rand::thread_rng().gen_range(0..cells.len())];
     
     // check top
-    if pos.0 > 0 {
-        match map[pos.0-1][pos.1] {
+    if pos > WIDTH {
+        match map[pos-WIDTH] {
             Tile::Collapsed(_) => (),
             Tile::Uncollapsed(ref mut entropy) => {
                 let mut new_entropy = 0;
@@ -156,8 +158,8 @@ fn main() {
         }
     }
     // check right
-    if pos.1 < WIDTH-1 {
-        match map[pos.0][pos.1+1] {
+    if pos % WIDTH != WIDTH - 1 {
+        match map[pos+1] {
             Tile::Collapsed(_) => (),
             Tile::Uncollapsed(ref mut entropy) => {
                 let mut new_entropy = 0;
@@ -172,8 +174,8 @@ fn main() {
         }
     }
     // check bottom
-    if pos.0 < HEIGHT-1 {
-        match map[pos.0+1][pos.1] {
+    if pos < WIDTH*(HEIGHT-1) {
+        match map[pos+WIDTH] {
             Tile::Collapsed(_) => (),
             Tile::Uncollapsed(ref mut entropy) => {
                 let mut new_entropy = 0;
@@ -188,8 +190,8 @@ fn main() {
         }
     }
     // check left
-    if pos.1 > 0 {
-        match map[pos.0][pos.1-1] {
+    if pos % WIDTH > 0 {
+        match map[pos-1] {
             Tile::Collapsed(_) => (),
             Tile::Uncollapsed(ref mut entropy) => {
                 let mut new_entropy = 0;
@@ -204,15 +206,15 @@ fn main() {
         }
     }
 
-    map[pos.0][pos.1] = Tile::Collapsed(chosen_cell);
+    map[pos] = Tile::Collapsed(chosen_cell);
 
     draw_map(&map);
 }
 
-fn draw_map(map: &[[Tile; WIDTH]; HEIGHT]) {
+fn draw_map(map: &[Tile; WIDTH*HEIGHT]) {
     for y in 0..HEIGHT {
         for x in 0..WIDTH {
-            match map[y][x] {
+            match map[y*WIDTH+x] {
                 Tile::Collapsed(cell) => print!("{}", cell.character),
                 Tile::Uncollapsed(entropy) => {
                     if entropy < 10 {
