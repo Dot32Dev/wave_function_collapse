@@ -2,8 +2,8 @@ use std::time::{Instant};
 use rand::Rng;
 use colored::*;
 
-const WIDTH: usize = 220;
-const HEIGHT: usize = 50;
+// const WIDTH: usize = 20;
+// const HEIGHT: usize = 50;
 
 #[derive(Clone, Copy, PartialEq)]
 enum Connection {
@@ -443,10 +443,17 @@ fn main() {
                 Connection::Empty
             ],
         },
+
     ];
+
+    let termsize::Size {rows, cols} = termsize::get().unwrap();
+    println!("{}x{}", rows, cols);
+
+    let rows = (rows - 2) as usize;
+    let cols = cols as usize;
     
     //1 dimensional array for a 2 dimensional map
-    let mut map = vec![Tile::Uncollapsed(cells.to_vec()); WIDTH * HEIGHT];
+    let mut map = vec![Tile::Uncollapsed(cells.to_vec()); cols as usize * rows as usize];
     
     let begining = Instant::now();
     'outer: loop {
@@ -492,24 +499,24 @@ fn main() {
                 Tile::Uncollapsed(entropy) => {
                     let chosen_cell = entropy[rand::thread_rng().gen_range(0..entropy.len())].clone();
                     map[chosen_tile] = Tile::Collapsed(chosen_cell);
-                    propogate_entropy(&mut map, &chosen_tile, &cells, &chosen_cell);
+                    propogate_entropy(&mut map, &chosen_tile, &cells, &chosen_cell, cols as usize, rows as usize);
                 },
             }
         }
         print!("{esc}c", esc = 27 as char);
-        draw_map(&map);
+        draw_map(&map, cols as usize, rows as usize);
     }
 
-    println!("Generated {} tiles in {} seconds", WIDTH*HEIGHT, begining.elapsed().as_secs());
+    println!("Generated {} tiles in {} seconds", cols*rows, begining.elapsed().as_secs());
 }
 
-fn draw_map(map: &Vec<Tile>) {
-    for y in 0..HEIGHT {
-        for x in 0..WIDTH {
-            match &map[y*WIDTH+x] {
+fn draw_map(map: &Vec<Tile>, cols: usize, rows: usize) {
+    for y in 0..rows {
+        for x in 0..cols {
+            match &map[y*cols+x] {
                 Tile::Collapsed(cell) => {
                     // print!("{}", cell.character)
-                    if x < 3 || y == 0 || x > WIDTH-3 || y == HEIGHT-1 {
+                    if x < 3 || y == 0 || x > cols-3 || y == rows-1 {
                         print!("{}", cell.character.to_string().on_red())
                     } else {
                         print!("{}", cell.character)
@@ -521,7 +528,7 @@ fn draw_map(map: &Vec<Tile>) {
                     } else {
                         // print!("{}", "█".truecolor(255/30*entropy.len() as u8, 255/30*entropy.len() as u8, 255/30*entropy.len() as u8))
                         // print!(" ")
-                        if x < 3 || y == 0 || x > WIDTH-3 || y == HEIGHT-1 {
+                        if x < 3 || y == 0 || x > cols-3 || y == rows-1 {
                             print!("{}", "░".on_red())
                         } else {
                             print!("░")
@@ -534,10 +541,10 @@ fn draw_map(map: &Vec<Tile>) {
     }
 }
 
-fn propogate_entropy(map: &mut Vec<Tile>, pos: &usize, cells: &[Cell], chosen_cell: &Cell) {
+fn propogate_entropy(map: &mut Vec<Tile>, pos: &usize, cells: &[Cell], chosen_cell: &Cell, cols: usize, rows: usize) {
     // check top
-    if pos > &WIDTH {
-        match map[pos-WIDTH] {
+    if pos > &cols {
+        match map[pos-cols] {
             Tile::Collapsed(_) => (),
             Tile::Uncollapsed(ref mut entropy) => {
                 let mut new_entropy: Vec<Cell> = Vec::new();
@@ -553,7 +560,7 @@ fn propogate_entropy(map: &mut Vec<Tile>, pos: &usize, cells: &[Cell], chosen_ce
         }
     }
     // check right
-    if pos % WIDTH != WIDTH - 1 {
+    if pos % cols != cols - 1 {
         match map[pos+1] {
             Tile::Collapsed(_) => (),
             Tile::Uncollapsed(ref mut entropy) => {
@@ -570,8 +577,8 @@ fn propogate_entropy(map: &mut Vec<Tile>, pos: &usize, cells: &[Cell], chosen_ce
         }
     }
     // check bottom
-    if pos < &(WIDTH*(HEIGHT-1)) {
-        match map[pos+WIDTH] {
+    if pos < &(cols*(rows-1)) {
+        match map[pos+cols] {
             Tile::Collapsed(_) => (),
             Tile::Uncollapsed(ref mut entropy) => {
                 let mut new_entropy: Vec<Cell> = Vec::new();
@@ -586,7 +593,7 @@ fn propogate_entropy(map: &mut Vec<Tile>, pos: &usize, cells: &[Cell], chosen_ce
         }
     }
     // check left
-    if pos % WIDTH > 0 {
+    if pos % cols > 0 {
         match map[pos-1] {
             Tile::Collapsed(_) => (),
             Tile::Uncollapsed(ref mut entropy) => {
