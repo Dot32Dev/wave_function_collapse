@@ -6,6 +6,7 @@ const HEIGHT: usize = 50;
 #[derive(Clone, Copy, PartialEq)]
 enum Connection {
     Double,
+    Single,
     Empty,
 }
 
@@ -138,44 +139,46 @@ fn main() {
     let mut map = vec![Tile::Uncollapsed(cells.to_vec()); WIDTH * HEIGHT];
 
     loop {
-        let mut possible_tiles = Vec::new();
-        for (i, tile) in map.iter().enumerate() {
-            match tile {
-                Tile::Collapsed(_) => (),
-                Tile::Uncollapsed(entropy) => {
-                    for other in possible_tiles.iter() {
-                        match &map[*other] {
-                            Tile::Collapsed(_) => unreachable!("possible_tiles contains a collapsed tile"),
-                            Tile::Uncollapsed(other_entropy) => {
-                                if entropy.len() < other_entropy.len() {
-                                    possible_tiles.clear();
-                                    possible_tiles.push(i);
-                                    break;
-                                } else if entropy.len() == other_entropy.len() {
-                                    possible_tiles.push(i);
-                                    break;
-                                }
-                            },
+        for _i in 0..10 {
+            let mut possible_tiles = Vec::new();
+            for (i, tile) in map.iter().enumerate() {
+                match tile {
+                    Tile::Collapsed(_) => (),
+                    Tile::Uncollapsed(entropy) => {
+                        for other in possible_tiles.iter() {
+                            match &map[*other] {
+                                Tile::Collapsed(_) => unreachable!("possible_tiles contains a collapsed tile"),
+                                Tile::Uncollapsed(other_entropy) => {
+                                    if entropy.len() < other_entropy.len() {
+                                        possible_tiles.clear();
+                                        possible_tiles.push(i);
+                                        break;
+                                    } else if entropy.len() == other_entropy.len() {
+                                        possible_tiles.push(i);
+                                        break;
+                                    }
+                                },
+                            }
                         }
-                    }
-                    if possible_tiles.is_empty() {
-                        possible_tiles.push(i);
-                    }
+                        if possible_tiles.is_empty() {
+                            possible_tiles.push(i);
+                        }
+                    },
+                }
+            }
+
+            // println!("possible_tiles: {:?}", possible_tiles);
+            let chosen_tile = possible_tiles[rand::thread_rng().gen_range(0..possible_tiles.len())];
+            // println!("chosen_tile: {}", chosen_tile);
+            
+            match &map[chosen_tile] {
+                Tile::Collapsed(_) => unreachable!("chosen_tile is a collapsed tile"),
+                Tile::Uncollapsed(entropy) => {
+                    let chosen_cell = entropy[rand::thread_rng().gen_range(0..entropy.len())].clone();
+                    map[chosen_tile] = Tile::Collapsed(chosen_cell);
+                    propogate_entropy(&mut map, &chosen_tile, &cells, &chosen_cell);
                 },
             }
-        }
-
-        // println!("possible_tiles: {:?}", possible_tiles);
-        let chosen_tile = possible_tiles[rand::thread_rng().gen_range(0..possible_tiles.len())];
-        println!("chosen_tile: {}", chosen_tile);
-        
-        match &map[chosen_tile] {
-            Tile::Collapsed(_) => unreachable!("chosen_tile is a collapsed tile"),
-            Tile::Uncollapsed(entropy) => {
-                let chosen_cell = entropy[rand::thread_rng().gen_range(0..entropy.len())].clone();
-                map[chosen_tile] = Tile::Collapsed(chosen_cell);
-                propogate_entropy(&mut map, &chosen_tile, &cells, &chosen_cell);
-            },
         }
         print!("{esc}c", esc = 27 as char);
         draw_map(&map);
