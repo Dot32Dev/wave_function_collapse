@@ -522,9 +522,9 @@ fn draw_map(map: &Vec<Tile>) {
                         // print!("{}", "█".truecolor(255/30*entropy.len() as u8, 255/30*entropy.len() as u8, 255/30*entropy.len() as u8))
                         // print!(" ")
                         if x < 3 || y == 0 || x > WIDTH-3 || y == HEIGHT-1 {
-                            print!("{}", " ".on_red())
+                            print!("{}", "░".on_red())
                         } else {
-                            print!(" ")
+                            print!("░")
                         }
                     }
                 },
