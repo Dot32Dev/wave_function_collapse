@@ -25,6 +25,8 @@ enum Tile {
 fn main() {
     // let Cells = ["═", "║", "╔", "╗", "╚", "╝╠", "╣", "╦", "╩", "╬"];
     let cells = [
+        // Double lines
+
         Cell {
             character: ' ',
             connections: [
@@ -133,6 +135,255 @@ fn main() {
                 Connection::Double
             ],
         },
+
+        // Joiners
+
+        Cell {
+            character: '╒',
+            connections: [
+                Connection::Empty, 
+                Connection::Double, 
+                Connection::Single, 
+                Connection::Empty
+            ],
+        },
+        Cell {
+            character: '╓',
+            connections: [
+                Connection::Empty, 
+                Connection::Single, 
+                Connection::Double, 
+                Connection::Empty
+            ],
+        },
+        Cell {
+            character: '╕',
+            connections: [
+                Connection::Empty, 
+                Connection::Empty, 
+                Connection::Single, 
+                Connection::Double
+            ],
+        },
+        Cell {
+            character: '╖',
+            connections: [
+                Connection::Empty, 
+                Connection::Empty, 
+                Connection::Double, 
+                Connection::Single
+            ],
+        },
+        Cell {
+            character: '╘',
+            connections: [
+                Connection::Single, 
+                Connection::Double, 
+                Connection::Empty, 
+                Connection::Empty
+            ],
+        },
+        Cell {
+            character: '╙',
+            connections: [
+                Connection::Double, 
+                Connection::Single, 
+                Connection::Empty, 
+                Connection::Empty
+            ],
+        },
+        Cell {
+            character: '╛',
+            connections: [
+                Connection::Single, 
+                Connection::Empty, 
+                Connection::Empty, 
+                Connection::Double
+            ],
+        },
+        Cell {
+            character: '╜',
+            connections: [
+                Connection::Double, 
+                Connection::Empty, 
+                Connection::Empty, 
+                Connection::Single
+            ],
+        },
+        Cell {
+            character: '╞',
+            connections: [
+                Connection::Single, 
+                Connection::Double, 
+                Connection::Single, 
+                Connection::Empty
+            ],
+        },
+        Cell {
+            character: '╟',
+            connections: [
+                Connection::Double, 
+                Connection::Single, 
+                Connection::Double, 
+                Connection::Empty
+            ],
+        },
+        Cell {
+            character: '╡',
+            connections: [
+                Connection::Single, 
+                Connection::Empty, 
+                Connection::Single, 
+                Connection::Double
+            ],
+        },
+        Cell {
+            character: '╢',
+            connections: [
+                Connection::Double, 
+                Connection::Empty, 
+                Connection::Double, 
+                Connection::Single
+            ],
+        },
+        Cell {
+            character: '╤',
+            connections: [
+                Connection::Empty, 
+                Connection::Double, 
+                Connection::Single, 
+                Connection::Double
+            ],
+        },
+        Cell {
+            character: '╥',
+            connections: [
+                Connection::Empty, 
+                Connection::Single, 
+                Connection::Double, 
+                Connection::Single
+            ],
+        },
+        Cell {
+            character: '╧',
+            connections: [
+                Connection::Single, 
+                Connection::Double, 
+                Connection::Empty, 
+                Connection::Double
+            ],
+        },
+        Cell {
+            character: '╨',
+            connections: [
+                Connection::Double, 
+                Connection::Single, 
+                Connection::Empty, 
+                Connection::Single
+            ],
+        },
+        Cell {
+            character: '╪',
+            connections: [
+                Connection::Single, 
+                Connection::Double, 
+                Connection::Single, 
+                Connection::Double
+            ],
+        },
+        Cell {
+            character: '╫',
+            connections: [
+                Connection::Double, 
+                Connection::Single, 
+                Connection::Double, 
+                Connection::Single
+            ],
+        },
+
+        // Single Lines
+
+        Cell {
+            character: '┌',
+            connections: [
+                Connection::Empty, 
+                Connection::Single, 
+                Connection::Single, 
+                Connection::Empty
+            ],
+        },
+        Cell {
+            character: '┐',
+            connections: [
+                Connection::Empty, 
+                Connection::Empty, 
+                Connection::Single, 
+                Connection::Single
+            ],
+        },
+        Cell {
+            character: '└',
+            connections: [
+                Connection::Single, 
+                Connection::Single, 
+                Connection::Empty, 
+                Connection::Empty
+            ],
+        },
+        Cell {
+            character: '┘',
+            connections: [
+                Connection::Single, 
+                Connection::Empty, 
+                Connection::Empty, 
+                Connection::Single
+            ],
+        },
+        Cell {
+            character: '├',
+            connections: [
+                Connection::Single, 
+                Connection::Single, 
+                Connection::Single, 
+                Connection::Empty
+            ],
+        },
+        Cell {
+            character: '┤',
+            connections: [
+                Connection::Single, 
+                Connection::Empty, 
+                Connection::Single, 
+                Connection::Single
+            ],
+        },
+        Cell {
+            character: '┬',
+            connections: [
+                Connection::Empty, 
+                Connection::Single, 
+                Connection::Single, 
+                Connection::Single
+            ],
+        },
+        Cell {
+            character: '┴',
+            connections: [
+                Connection::Single, 
+                Connection::Single, 
+                Connection::Empty, 
+                Connection::Single
+            ],
+        },
+        Cell {
+            character: '┼',
+            connections: [
+                Connection::Single, 
+                Connection::Single, 
+                Connection::Single, 
+                Connection::Single
+            ],
+        },
     ];
 
     //1 dimensional array for a 2 dimensional map
@@ -206,7 +457,7 @@ fn draw_map(map: &Vec<Tile>) {
     }
 }
 
-fn propogate_entropy(map: &mut Vec<Tile>, pos: &usize, cells: &[Cell; 12], chosen_cell: &Cell) {
+fn propogate_entropy(map: &mut Vec<Tile>, pos: &usize, cells: &[Cell], chosen_cell: &Cell) {
     // check top
     if pos > &WIDTH {
         match map[pos-WIDTH] {
