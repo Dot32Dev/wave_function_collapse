@@ -138,7 +138,7 @@ fn main() {
     let mut map = vec![Tile::Uncollapsed(cells.to_vec()); WIDTH * HEIGHT];
     let pos: usize = rand::thread_rng().gen_range(0..WIDTH * HEIGHT);
     println!("pos: {}", pos);
-    let mut chosen_cell = cells[rand::thread_rng().gen_range(0..cells.len())];
+    let chosen_cell = cells[rand::thread_rng().gen_range(0..cells.len())];
     
     // check top
     if pos > WIDTH {
@@ -242,11 +242,11 @@ fn main() {
     match &map[chosen_tile] {
         Tile::Collapsed(_) => unreachable!("chosen_tile is a collapsed tile"),
         Tile::Uncollapsed(entropy) => {
-            chosen_cell = entropy[rand::thread_rng().gen_range(0..entropy.len())].clone();
+            let chosen_cell = entropy[rand::thread_rng().gen_range(0..entropy.len())].clone();
+            map[chosen_tile] = Tile::Collapsed(chosen_cell);
         },
     }
 
-    map[chosen_tile] = Tile::Collapsed(chosen_cell);
 
     draw_map(&map);
 }
