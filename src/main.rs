@@ -9,7 +9,7 @@ enum Connection {
     Empty,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 struct Cell {
     character: char,
     connections: [Connection; 4],
@@ -209,12 +209,13 @@ fn propogate_entropy(map: &mut Vec<Tile>, pos: &usize, cells: &[Cell; 12], chose
             Tile::Uncollapsed(ref mut entropy) => {
                 let mut new_entropy: Vec<Cell> = Vec::new();
                 for cell in cells.iter() {
-                    if cell.connections[2] == chosen_cell.connections[0] {
+                    if cell.connections[2] != chosen_cell.connections[0] {
                         new_entropy.push(cell.clone());
                     }
                 }
                 // entropy -= cells.len() as u8 - new_entropy;
-                *entropy = new_entropy;
+                // *entropy = new_entropy;
+                subtract_vector(entropy, &new_entropy);
             },
         }
     }
@@ -225,12 +226,13 @@ fn propogate_entropy(map: &mut Vec<Tile>, pos: &usize, cells: &[Cell; 12], chose
             Tile::Uncollapsed(ref mut entropy) => {
                 let mut new_entropy: Vec<Cell> = Vec::new();
                 for cell in cells.iter() {
-                    if cell.connections[3] == chosen_cell.connections[1] {
+                    if cell.connections[3] != chosen_cell.connections[1] {
                         new_entropy.push(cell.clone());
                     }
                 }
                 // entropy -= cells.len() as u8 - new_entropy;
-                *entropy = new_entropy;
+                // *entropy = new_entropy;
+                subtract_vector(entropy, &new_entropy);
             },
         }
     }
@@ -241,12 +243,12 @@ fn propogate_entropy(map: &mut Vec<Tile>, pos: &usize, cells: &[Cell; 12], chose
             Tile::Uncollapsed(ref mut entropy) => {
                 let mut new_entropy: Vec<Cell> = Vec::new();
                 for cell in cells.iter() {
-                    if cell.connections[0] == chosen_cell.connections[2] {
+                    if cell.connections[0] != chosen_cell.connections[2] {
                         new_entropy.push(cell.clone());
                     }
                 }
                 // entropy -= cells.len() as u8 - new_entropy;
-                *entropy = new_entropy;
+                subtract_vector(entropy, &new_entropy);
             },
         }
     }
@@ -257,13 +259,17 @@ fn propogate_entropy(map: &mut Vec<Tile>, pos: &usize, cells: &[Cell; 12], chose
             Tile::Uncollapsed(ref mut entropy) => {
                 let mut new_entropy: Vec<Cell> = Vec::new();
                 for cell in cells.iter() {
-                    if cell.connections[1] == chosen_cell.connections[3] {
+                    if cell.connections[1] != chosen_cell.connections[3] {
                         new_entropy.push(cell.clone());
                     }
                 }
-                // entropy -= cells.len() as u8 - new_entropy;
-                *entropy = new_entropy;
+
+                subtract_vector(entropy, &new_entropy);
             },
         }
     }
+}
+
+fn subtract_vector(a: &mut Vec<Cell>, b: &Vec<Cell>) {
+    a.retain(|x| !b.contains(x));
 }
