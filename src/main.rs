@@ -1,4 +1,5 @@
 use rand::Rng;
+use colored::*;
 
 const WIDTH: usize = 220;
 const HEIGHT: usize = 50;
@@ -446,8 +447,8 @@ fn main() {
     //1 dimensional array for a 2 dimensional map
     let mut map = vec![Tile::Uncollapsed(cells.to_vec()); WIDTH * HEIGHT];
 
-    loop {
-        for _i in 0..10 {
+    'outer: loop {
+        for _i in 0..20 {
             let mut possible_tiles = Vec::new();
             for (i, tile) in map.iter().enumerate() {
                 match tile {
@@ -476,6 +477,11 @@ fn main() {
             }
 
             // println!("possible_tiles: {:?}", possible_tiles);
+
+            if possible_tiles.len() == 0 {
+                break 'outer;
+            }
+
             let chosen_tile = possible_tiles[rand::thread_rng().gen_range(0..possible_tiles.len())];
             // println!("chosen_tile: {}", chosen_tile);
             
@@ -500,13 +506,25 @@ fn draw_map(map: &Vec<Tile>) {
     for y in 0..HEIGHT {
         for x in 0..WIDTH {
             match &map[y*WIDTH+x] {
-                Tile::Collapsed(cell) => print!("{}", cell.character),
+                Tile::Collapsed(cell) => {
+                    // print!("{}", cell.character)
+                    if x < 3 || y == 0 || x > WIDTH-3 || y == HEIGHT-1 {
+                        print!("{}", cell.character.to_string().on_red())
+                    } else {
+                        print!("{}", cell.character)
+                    }
+                },
                 Tile::Uncollapsed(entropy) => {
                     if entropy.len() < 10 {
                         print!("{}", entropy.len())
                     } else {
-                        // print!("█")
-                        print!(" ")
+                        // print!("{}", "█".truecolor(255/30*entropy.len() as u8, 255/30*entropy.len() as u8, 255/30*entropy.len() as u8))
+                        // print!(" ")
+                        if x < 3 || y == 0 || x > WIDTH-3 || y == HEIGHT-1 {
+                            print!("{}", " ".on_red())
+                        } else {
+                            print!(" ")
+                        }
                     }
                 },
             }
