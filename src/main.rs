@@ -384,6 +384,63 @@ fn main() {
                 Connection::Single
             ],
         },
+        Cell {
+            character: '│',
+            connections: [
+                Connection::Single, 
+                Connection::Empty, 
+                Connection::Single, 
+                Connection::Empty
+            ],
+        },
+        Cell {
+            character: '─',
+            connections: [
+                Connection::Empty, 
+                Connection::Single, 
+                Connection::Empty, 
+                Connection::Single
+            ],
+        },
+
+        // Curves
+
+        Cell {
+            character: '╭',
+            connections: [
+                Connection::Empty, 
+                Connection::Single, 
+                Connection::Single, 
+                Connection::Empty
+            ],
+        },
+        Cell {
+            character: '╮',
+            connections: [
+                Connection::Empty, 
+                Connection::Empty, 
+                Connection::Single, 
+                Connection::Single
+            ],
+        },
+        Cell {
+            character: '╯',
+            connections: [
+                Connection::Single, 
+                Connection::Empty, 
+                Connection::Empty, 
+                Connection::Single
+            ],
+        },
+        Cell {
+            character: '╰',
+            connections: [
+                Connection::Single, 
+                Connection::Single, 
+                Connection::Empty, 
+                Connection::Empty
+            ],
+        },
     ];
 
     //1 dimensional array for a 2 dimensional map
@@ -448,7 +505,8 @@ fn draw_map(map: &Vec<Tile>) {
                     if entropy.len() < 10 {
                         print!("{}", entropy.len())
                     } else {
-                        print!("█")
+                        // print!("█")
+                        print!(" ")
                     }
                 },
             }
