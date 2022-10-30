@@ -1,3 +1,4 @@
+use std::time::{Instant};
 use rand::Rng;
 use colored::*;
 
@@ -443,10 +444,11 @@ fn main() {
             ],
         },
     ];
-
+    
     //1 dimensional array for a 2 dimensional map
     let mut map = vec![Tile::Uncollapsed(cells.to_vec()); WIDTH * HEIGHT];
-
+    
+    let begining = Instant::now();
     'outer: loop {
         for _i in 0..20 {
             let mut possible_tiles = Vec::new();
@@ -498,8 +500,7 @@ fn main() {
         draw_map(&map);
     }
 
-
-    // draw_map(&map);
+    println!("Generated {} tiles in {} seconds", WIDTH*HEIGHT, begining.elapsed().as_secs());
 }
 
 fn draw_map(map: &Vec<Tile>) {
