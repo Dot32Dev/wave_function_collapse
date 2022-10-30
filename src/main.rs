@@ -3,22 +3,22 @@ use rand::Rng;
 const WIDTH: usize = 50;
 const HEIGHT: usize = 10;
 
-#[derive(Clone, Copy, Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Clone, Copy, PartialEq)]
 enum Connection {
     Double,
     Empty,
 }
 
-#[derive(Clone, Copy, Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Clone, Copy)]
 struct Cell {
     character: char,
     connections: [Connection; 4],
 }
 
-#[derive(Clone, Copy, Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Clone)]
 enum Tile {
     Collapsed(Cell),
-    Uncollapsed(u8),
+    Uncollapsed(Vec<Cell>),
 }
 
 fn main() {
@@ -135,7 +135,7 @@ fn main() {
     ];
 
     //1 dimensional array for a 2 dimensional map
-    let mut map = [Tile::Uncollapsed(cells.len() as u8); WIDTH * HEIGHT];
+    let mut map = vec![Tile::Uncollapsed(cells.to_vec()); WIDTH * HEIGHT];
     let pos: usize = rand::thread_rng().gen_range(0..WIDTH * HEIGHT);
     println!("pos: {}", pos);
     let chosen_cell = cells[rand::thread_rng().gen_range(0..cells.len())];
@@ -145,10 +145,10 @@ fn main() {
         match map[pos-WIDTH] {
             Tile::Collapsed(_) => (),
             Tile::Uncollapsed(ref mut entropy) => {
-                let mut new_entropy = 0;
+                let mut new_entropy: Vec<Cell> = Vec::new();
                 for cell in cells.iter() {
                     if cell.connections[2] == chosen_cell.connections[0] {
-                        new_entropy += 1;
+                        new_entropy.push(cell.clone());
                     }
                 }
                 // entropy -= cells.len() as u8 - new_entropy;
@@ -161,10 +161,10 @@ fn main() {
         match map[pos+1] {
             Tile::Collapsed(_) => (),
             Tile::Uncollapsed(ref mut entropy) => {
-                let mut new_entropy = 0;
+                let mut new_entropy: Vec<Cell> = Vec::new();
                 for cell in cells.iter() {
                     if cell.connections[3] == chosen_cell.connections[1] {
-                        new_entropy += 1;
+                        new_entropy.push(cell.clone());
                     }
                 }
                 // entropy -= cells.len() as u8 - new_entropy;
@@ -177,10 +177,10 @@ fn main() {
         match map[pos+WIDTH] {
             Tile::Collapsed(_) => (),
             Tile::Uncollapsed(ref mut entropy) => {
-                let mut new_entropy = 0;
+                let mut new_entropy: Vec<Cell> = Vec::new();
                 for cell in cells.iter() {
                     if cell.connections[0] == chosen_cell.connections[2] {
-                        new_entropy += 1;
+                        new_entropy.push(cell.clone());
                     }
                 }
                 // entropy -= cells.len() as u8 - new_entropy;
@@ -193,10 +193,10 @@ fn main() {
         match map[pos-1] {
             Tile::Collapsed(_) => (),
             Tile::Uncollapsed(ref mut entropy) => {
-                let mut new_entropy = 0;
+                let mut new_entropy: Vec<Cell> = Vec::new();
                 for cell in cells.iter() {
                     if cell.connections[1] == chosen_cell.connections[3] {
-                        new_entropy += 1;
+                        new_entropy.push(cell.clone());
                     }
                 }
                 // entropy -= cells.len() as u8 - new_entropy;
@@ -213,14 +213,14 @@ fn main() {
             Tile::Collapsed(_) => (),
             Tile::Uncollapsed(entropy) => {
                 for other in possible_tiles.iter() {
-                    match map[*other] {
+                    match &map[*other] {
                         Tile::Collapsed(_) => unreachable!("possible_tiles contains a collapsed tile"),
                         Tile::Uncollapsed(other_entropy) => {
-                            if entropy < &other_entropy {
+                            if entropy.len() < other_entropy.len() {
                                 possible_tiles.clear();
                                 possible_tiles.push(i);
                                 break;
-                            } else if entropy == &other_entropy {
+                            } else if entropy.len() == other_entropy.len() {
                                 possible_tiles.push(i);
                                 break;
                             }
@@ -238,17 +238,27 @@ fn main() {
     let chosen_tile = possible_tiles[rand::thread_rng().gen_range(0..possible_tiles.len())];
     println!("chosen_tile: {}", chosen_tile);
 
+    // // check top
+    // if chosen_tile > WIDTH {
+    //     match map[chosen_tile-WIDTH] {
+    //         Tile::Collapsed(cell) => {
+                
+    //         },
+    //         Tile::Uncollapsed(_) => (),
+    //     }
+    // }
+
     draw_map(&map);
 }
 
-fn draw_map(map: &[Tile; WIDTH*HEIGHT]) {
+fn draw_map(map: &Vec<Tile>) {
     for y in 0..HEIGHT {
         for x in 0..WIDTH {
-            match map[y*WIDTH+x] {
+            match &map[y*WIDTH+x] {
                 Tile::Collapsed(cell) => print!("{}", cell.character),
                 Tile::Uncollapsed(entropy) => {
-                    if entropy < 10 {
-                        print!("{}", entropy)
+                    if entropy.len() < 10 {
+                        print!("{}", entropy.len())
                     } else {
                         print!("█")
                     }
