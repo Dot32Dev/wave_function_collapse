@@ -1,7 +1,7 @@
 use rand::Rng;
 
-const WIDTH: usize = 50;
-const HEIGHT: usize = 10;
+const WIDTH: usize = 220;
+const HEIGHT: usize = 50;
 
 #[derive(Clone, Copy, PartialEq)]
 enum Connection {
@@ -137,7 +137,7 @@ fn main() {
     //1 dimensional array for a 2 dimensional map
     let mut map = vec![Tile::Uncollapsed(cells.to_vec()); WIDTH * HEIGHT];
 
-    // for i in 0..5 {
+    loop {
         let mut possible_tiles = Vec::new();
         for (i, tile) in map.iter().enumerate() {
             match tile {
@@ -177,10 +177,12 @@ fn main() {
                 propogate_entropy(&mut map, &chosen_tile, &cells, &chosen_cell);
             },
         }
-    // }
+        print!("{esc}c", esc = 27 as char);
+        draw_map(&map);
+    }
 
 
-    draw_map(&map);
+    // draw_map(&map);
 }
 
 fn draw_map(map: &Vec<Tile>) {
